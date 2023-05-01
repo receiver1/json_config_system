@@ -31,6 +31,8 @@ public:
   Config(const std::filesystem::path path = std::filesystem::current_path())
       : path_{path} {}
 
+  void set_default_path(const std::filesystem::path path) { path_ = path; }
+
   /*
    * Adds a variables in storage
    * \param[in] variable Base variable class
@@ -102,12 +104,12 @@ static Config instance{};
  * Wrapper for variables that handles their loading and saving
  * Automatically adds a variable to storage in Config
  */
-template <typename T> class ConfigVariable_t : public ConfigVariableBase_t {
-  T value_;
+template <typename _Ty> class ConfigVariable_t : public ConfigVariableBase_t {
+  _Ty value_;
 
 public:
   constexpr ConfigVariable_t() = default;
-  ConfigVariable_t(const std::string key, const T value)
+  ConfigVariable_t(const std::string key, const _Ty value)
       : ConfigVariableBase_t{key}, value_{value} {
     instance.add_variable(this);
   }
@@ -116,15 +118,24 @@ public:
     if (object.find(key_) == object.end())
       return;
 
-    value_ = object[key_].get<T>();
+    value_ = object[key_].get<_Ty>();
   }
   void save(nlohmann::json &object) const override { object[key_] = value_; }
 
-  operator T() const { return value_; }
-  T *operator&() { return &value_; }
-  void set(const T value) { value_ = value; }
-  T &get() { return value_; }
-  const T &get() const { return value_; }
+  [[nodiscard]] _Ty &get() noexcept { return value_; }
+  [[nodiscard]] operator _Ty() noexcept { return this->get(); }
+  [[nodiscard]] _Ty *operator&() noexcept { return &this->get(); }
+  template <class _Ty2 = _Ty,
+            std::enable_if_t<
+                !std::disjunction_v<std::is_array<_Ty2>, std::is_void<_Ty2>>,
+                int> = 0>
+  [[nodiscard]] _Ty2 &operator*() noexcept {
+    return this->get();
+  }
+  template <class _Ty2 = _Ty, std::enable_if_t<!std::is_array_v<_Ty2>, int> = 0>
+  [[nodiscard]] _Ty2 *operator->() noexcept {
+    return &this->get();
+  }
 };
 
 } // namespace config
