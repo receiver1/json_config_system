@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "nlohmann_json/json.hpp"
 #include <filesystem>
@@ -9,8 +9,8 @@
 namespace config {
 
 /*
-* Pure virtual class needed for polymorphism
-*/
+ * Pure virtual class needed for polymorphism
+ */
 class ConfigVariableBase_t {
 protected:
   std::string key_{};
@@ -24,22 +24,25 @@ public:
 };
 
 class Config {
-  std::filesystem::path path_{std::filesystem::current_path()};
-  std::vector<ConfigVariableBase_t *> variables_;
+  std::filesystem::path path_;
+  std::vector<ConfigVariableBase_t *> variables_{};
 
 public:
+  Config(const std::filesystem::path path = std::filesystem::current_path())
+      : path_{path} {}
+
   /*
-  * Adds a variables in storage
-  * \param[in] variable Base variable class
-  */
+   * Adds a variables in storage
+   * \param[in] variable Base variable class
+   */
   void add_variable(ConfigVariableBase_t *const variable) {
     variables_.push_back(variable);
   }
 
   /*!
-  * Saves stored variables in json
-  * \return Store containing json
-  */
+   * Saves stored variables in json
+   * \return Store containing json
+   */
   std::string get() const {
     nlohmann::json object{};
     for (auto &variable : variables_)
@@ -49,9 +52,9 @@ public:
   }
 
   /*!
-  * Loads stored variables from json
-  * \param[in] json Store containing json
-  */
+   * Loads stored variables from json
+   * \param[in] json Store containing json
+   */
   void set(std::string json) {
     const auto object{nlohmann::json::parse(json)};
     if (!object.is_object())
@@ -62,9 +65,9 @@ public:
   }
 
   /*
-  * Loads configuration from file
-  * \param[in] file_name File name
-  */
+   * Loads configuration from file
+   * \param[in] file_name File name without path
+   */
   void load(std::string file_name) {
     std::filesystem::create_directory(path_);
 
@@ -80,9 +83,9 @@ public:
   }
 
   /*
-  * Saves configuration in file
-  * \param[in] file_name File name, without path
-  */
+   * Saves configuration in file
+   * \param[in] file_name File name without path
+   */
   void save(std::string file_name) const {
     std::filesystem::create_directory(path_);
 
@@ -96,9 +99,9 @@ public:
 static Config instance{};
 
 /*
-* Wrapper for variables that handles their loading and saving
-* Automatically adds a variable to storage in Config
-*/
+ * Wrapper for variables that handles their loading and saving
+ * Automatically adds a variable to storage in Config
+ */
 template <typename T> class ConfigVariable_t : public ConfigVariableBase_t {
   T value_;
 
