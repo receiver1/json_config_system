@@ -1,11 +1,11 @@
 # config_system
 A configuration system that simplifies the loading and saving of JSON
 
-## Dependencies
-* [nlohmann::json](https://github.com/nlohmann/json)
-
 ## Examples
 You can find usage example in `examples` folder
+
+## Dependencies
+* [nlohmann::json](https://github.com/nlohmann/json)
 
 ## Installation
 1. Download repository
