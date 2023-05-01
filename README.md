@@ -2,7 +2,7 @@
 A configuration system that simplifies the loading and saving of JSON
 
 ## Examples
-You can find usage example in `examples` folder
+You can find usage example in `example.cpp` file
 
 ## Dependencies
 * [nlohmann::json](https://github.com/nlohmann/json)
