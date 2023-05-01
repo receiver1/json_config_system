@@ -1,4 +1,4 @@
-# config_system
+# json_config_system
 A configuration system that simplifies the loading and saving of JSON
 
 ## Examples
